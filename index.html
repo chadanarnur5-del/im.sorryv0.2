@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ты простишь меня?</title>
+    <!-- Подключаем библиотеку для конфетти -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #eef2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+        }
+
+        .img-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px auto;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            min-height: 50px;
+            position: relative;
+        }
+
+        button {
+            padding: 10px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        #yesBtn {
+            background-color: #4A90E2;
+            color: white;
+            z-index: 10;
+        }
+
+        #yesBtn:hover {
+            background-color: #357ABD;
+            transform: scale(1.05);
+        }
+
+        #noBtn {
+            background-color: #e0e0e0;
+            color: #333;
+            position: absolute;
+        }
+
+        .letter-screen {
+            display: none;
+        }
+
+        .letter-screen p {
+            color: #555;
+            line-height: 1.6;
+            margin-top: 15px;
+            font-size: 15px;
+            text-align: left;
+        }
+
+        .restart-btn {
+            margin-top: 20px;
+            background-color: #f0f0f0;
+            color: #666;
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="card">
+        <!-- Шаг 1: Вопрос -->
+        <div id="questionScreen">
+            <div class="img-container">
+                <!-- Грустный котик / эмодзи -->
+                <img id="mainImage" src="https://media.tenor.com/images/8410264103133611110/tenor.gif" alt="Грустный кот">
+            </div>
+            <h1 id="titleText">Ты простишь меня? 🥺</h1>
+            <div class="buttons-container" id="btnContainer">
+                <button id="yesBtn">Да</button>
+                <button id="noBtn">Нет</button>
+            </div>
+        </div>
+
+        <!-- Шаг 2: Письмо после согласия -->
+        <div id="letterScreen" class="letter-screen">
+            <div class="img-container">
+                <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" alt="Счастливый кот">
+            </div>
+            <h1>Я знал(а), что ты меня простишь! ❤️</h1>
+            <p>Я правда очень сожалею о том, что произошло. Ты очень важен(на) для меня, и я никогда не хотел(а) тебя обидеть. Обещаю делать всё, чтобы больше тебя не расстраивать!</p>
+            <button class="restart-btn" onclick="location.reload()">Начать заново</button>
+        </div>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const questionScreen = document.getElementById('questionScreen');
+        const letterScreen = document.getElementById('letterScreen');
+        const btnContainer = document.getElementById('btnContainer');
+
+        // Выравниваем первоначальное положение кнопки "Нет" рядом с "Да"
+        function alignButtons() {
+            const yesRect = yesBtn.getBoundingClientRect();
+            const containerRect = btnContainer.getBoundingClientRect();
+            noBtn.style.left = (yesBtn.offsetLeft + yesBtn.offsetWidth + 20) + 'px';
+            noBtn.style.top = yesBtn.offsetTop + 'px';
+        }
+
+        window.onload = alignButtons;
+
+        // Убегающая кнопка "Нет" при наведении или клике
+        function moveNoButton() {
+            const card = document.getElementById('card');
+            const cardRect = card.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+
+            // Генерируем случайные координаты внутри карточки
+            const maxX = cardRect.width - btnRect.width - 20;
+            const maxY = cardRect.height - btnRect.height - 20;
+
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            noBtn.style.position = 'absolute';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+        }
+
+        noBtn.addEventListener('mouseover', moveNoButton);
+        noBtn.addEventListener('click', moveNoButton);
+
+        // Нажатие на "Да"
+        yesBtn.addEventListener('click', () => {
+            questionScreen.style.display = 'none';
+            letterScreen.style.display = 'block';
+
+            // Запуск эффекта конфетти
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        });
+    </script>
+</body>
+</html>
